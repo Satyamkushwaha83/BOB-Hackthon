@@ -95,6 +95,8 @@ export function computeTriage(p: TriageInput): Triage {
   push(urgentReasons, f.includes("breathlessness"), "Severe breathlessness reported");
   push(urgentReasons, f.includes("heavyBleeding"), "Heavy / uncontrolled bleeding reported");
   push(urgentReasons, f.includes("unconscious"), "Unconscious / unresponsive");
+  push(urgentReasons, f.includes("seizure"), "Seizure / convulsions reported");
+  push(urgentReasons, f.includes("severeAbdomen"), "Severe abdominal rigidity reported");
 
   const amberReasons: string[] = [];
   push(amberReasons, f.includes("confusion"), "Confusion / altered mental state reported");
