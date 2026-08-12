@@ -36,8 +36,8 @@ export function InfoTag({ label, color = "slate" }: { label: string; color?: "sl
 
 export function DisclaimerBar({ lang, compact }: { lang: UILang; compact?: boolean }) {
   return (
-    <div className={"flex items-start gap-2 bg-amber-50 border border-amber-300 text-amber-800 rounded-lg " + (compact ? "px-3 py-1.5 text-xs" : "px-4 py-2.5 text-sm")}>
-      <span>⚠️</span>
+    <div className={"flex items-start gap-2 bg-amber-50 border border-amber-300 text-amber-800 rounded-lg " + (compact ? "px-3 py-1.5 text-xs" : "px-4 py-2.5 text-sm")} role="alert" aria-live="polite">
+      <span aria-hidden="true">⚠️</span>
       <div>
         <b>{translate(lang, "disclaimerShort")}.</b> {!compact && translate(lang, "disclaimerLong")}
       </div>
