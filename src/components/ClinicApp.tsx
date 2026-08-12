@@ -88,7 +88,9 @@ export function ClinicApp() {
   const activeConsultation = activeConsultationId ? consultations.find((c) => c.id === activeConsultationId) : null;
   const activePatient = activeConsultation ? patients.find((p) => p.id === activeConsultation.patientId) : null;
 
-  const myPatients = currentUser.role === "doctor" ? patients : patients.filter((p) => p.createdBy === currentUser.id);
+  const myPatients = currentUser.role === "doctor"
+    ? patients
+    : patients.filter((p) => p.createdBy === currentUser.id || consultations.some((c) => c.patientId === p.id && c.healthWorkerId === currentUser.id));
   const myConsultations = currentUser.role === "doctor" ? consultations : consultations.filter((c) => c.healthWorkerId === currentUser.id);
 
   const navigate = (s: SectionId) => {
