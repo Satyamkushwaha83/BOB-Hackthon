@@ -29,7 +29,7 @@ export function DoctorCasesSection({
         <span>
           <span className="block font-semibold text-slate-800">{p?.name}</span>
           <span className="block text-xs text-slate-400">
-            {p?.age}y · {c.symptoms.structured.join(", ") || "—"}
+            {p?.age}y{p?.village ? ` · ${p.village}` : ""} · {c.symptoms.structured.join(", ") || "—"}
           </span>
         </span>
         <span className="flex items-center gap-3">
