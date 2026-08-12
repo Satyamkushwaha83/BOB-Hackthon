@@ -7,14 +7,17 @@ export function AnalyticsSection({ consultations, uiLang }: { consultations: Con
   const t = (k: Parameters<typeof translate>[1]) => translate(uiLang, k);
   const total = consultations.length;
   const urgent = consultations.filter((c) => c.triage?.level === "urgent").length;
-  const flagged = consultations.filter((c) => c.triage && c.triage.reasons[0] !== "All recorded vitals within normal range; symptoms consistent with a minor / routine condition.").length;
+  const amber = consultations.filter((c) => c.triage?.level === "amber").length;
+  const flagged = urgent + amber;
   const completed = consultations.filter((c) => c.status === "done").length;
+  const waitingDoctor = consultations.filter((c) => c.status === "waiting-doctor").length;
 
   const cards = [
     { label: t("totalConsultations"), n: total, color: "bg-blue-600" },
     { label: t("urgentCases"), n: urgent, color: "bg-red-600" },
     { label: t("avgVitalsFlagged"), n: flagged, color: "bg-amber-500" },
     { label: t("completedToday"), n: completed, color: "bg-emerald-600" },
+    { label: "Awaiting Doctor", n: waitingDoctor, color: "bg-purple-600" },
   ];
 
   const byTriage = [
