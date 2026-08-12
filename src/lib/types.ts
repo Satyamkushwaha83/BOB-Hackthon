@@ -33,6 +33,9 @@
 
 export type Role = "health_worker" | "doctor";
 
+/** Gender options used across the app */
+export type Gender = "Male" | "Female" | "Other";
+
 export interface User {
   id: string;
   name: string;
@@ -120,12 +123,14 @@ export interface Patient {
   id: string;
   name: string;
   age: string;
-  gender: string;
+  gender: Gender;
   language: string;
   phone: string;
   history: History;
   createdAt: number;
   createdBy: string;
+  /** Optional village/address for rural context */
+  village?: string;
 }
 
 /** One clinic visit / encounter for a Patient. This is the clinical workflow record. */
