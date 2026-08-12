@@ -97,6 +97,7 @@ export function QueueSection({
                     <div className="font-semibold text-slate-800">{p.name}</div>
                     <div className="text-slate-400 text-xs">
                       {p.age}y · {p.gender} · {p.language}
+                      {p.village && ` · ${p.village}`}
                     </div>
                   </td>
                   <td className="px-4 py-3 text-slate-600 max-w-xs truncate">{c.symptoms.structured.join(", ") || "—"}</td>
