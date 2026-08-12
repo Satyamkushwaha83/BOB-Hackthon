@@ -24,6 +24,8 @@ export const RED_FLAGS = [
   { key: "breathlessness", label: "Severe breathlessness" },
   { key: "heavyBleeding", label: "Heavy / uncontrolled bleeding" },
   { key: "unconscious", label: "Unconscious / unresponsive" },
+  { key: "seizure", label: "Seizure / convulsions" },
+  { key: "severeAbdomen", label: "Severe abdominal pain (rigid belly)" },
 ];
 
 export function vitalStatus(type: "temp" | "pulse" | "spo2", raw: string): VitalStatus {
