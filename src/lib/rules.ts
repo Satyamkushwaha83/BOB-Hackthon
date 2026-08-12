@@ -210,6 +210,37 @@ export const CONDITION_LIBRARY: ConditionEntry[] = [
     dangerSigns: ["Difficulty breathing or fast breathing", "Bluish lips or face", "Cough with high fever for more than 3 days", "Chest pain with cough"],
     contraindications: ["Do not give honey to infants under 1 year (botulism risk)", "Avoid cough suppressants in children under 6 without doctor advice"],
   },
+  {
+    id: "diarrhea",
+    matchLabel: "Diarrhea",
+    steps: [
+      "Give ORS (Oral Rehydration Solution) — 1 packet per litre of clean water, sip frequently.",
+      "Continue feeding — do NOT fast the patient, especially children.",
+      "Wash hands with soap before preparing food or ORS.",
+      "Watch for signs of dehydration: sunken eyes, dry mouth, no urine for 6+ hours.",
+      "If stools contain blood or mucus, or dehydration worsens — escalate to doctor immediately.",
+    ],
+    otc: [
+      { name: "Oral Rehydration Solution (ORS)", adultDose: "1 packet in 1L water, sip throughout the day", childDose: "Small frequent sips; follow WHO ORS chart", category: "hydration", minAge: 0 },
+      { name: "Zinc sulfate 20mg (children 6m–5y)", adultDose: "Not applicable", childDose: "20mg/day for 14 days — reduces duration and recurrence", category: "supplement", minAge: 0 },
+    ],
+    dangerSigns: ["Watery stool > 10 times a day", "Blood or mucus in stool", "Unable to keep any fluid down", "Signs of severe dehydration: sunken fontanelle (infants), extreme weakness"],
+    contraindications: ["Do not give anti-diarrhoeals (Loperamide) to children under 12 without doctor advice"],
+  },
+  {
+    id: "abdominal-pain",
+    matchLabel: "Abdominal Pain",
+    steps: [
+      "Help the patient rest in a comfortable position.",
+      "Encourage small sips of water if nausea is not present.",
+      "Do NOT give strong painkillers or antispasmodics without doctor advice.",
+      "Note the location, severity and whether pain is constant or crampy.",
+      "If pain is severe, worsening, or belly is rigid — escalate to doctor immediately.",
+    ],
+    otc: [],
+    dangerSigns: ["Rigid/board-like abdomen", "Pain with fever and vomiting", "Pain after injury to abdomen", "Pain in a pregnant woman"],
+    contraindications: ["Avoid strong analgesics or NSAIDs before the cause is known — can mask serious conditions"],
+  },
 ];
 
 export function getFirstAid(patient: { symptoms: Symptoms }): FirstAid {
