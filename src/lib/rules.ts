@@ -79,7 +79,15 @@ export const statusColor: Record<VitalStatus, string> = {
   normal: "text-emerald-600 bg-emerald-50 border-emerald-200",
   mid: "text-amber-600 bg-amber-50 border-amber-300",
   high: "text-red-600 bg-red-50 border-red-300",
-  low: "text-amber-600 bg-amber-50 border-amber-300",
+  low: "text-blue-600 bg-blue-50 border-blue-200",
+};
+
+/** Human-readable label for a VitalStatus value */
+export const statusLabel: Record<VitalStatus, string> = {
+  normal: "Normal",
+  mid: "Borderline",
+  high: "Abnormal",
+  low: "Low",
 };
 
 interface TriageInput {
