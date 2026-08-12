@@ -102,7 +102,9 @@ export function LoginScreen({ uiLang, setUiLang, onLogin }: { uiLang: UILang; se
           </>
         )}
       </div>
-      <p className="text-xs text-slate-400 mt-6 text-center max-w-md">Hackathon prototype — accounts and data are simulated in-memory, not a real user database.</p>
+      <p className="text-xs text-slate-400 mt-6 text-center max-w-md">
+        Sehat-Sarthi prototype · accounts and data are simulated in-memory, not a real database.
+      </p>
     </div>
   );
 }
