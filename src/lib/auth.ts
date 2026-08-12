@@ -72,3 +72,11 @@ export function login(email: string, password: string, role: User["role"]): User
 export function doctors(): User[] {
   return USERS.filter((u) => u.role === "doctor");
 }
+
+export function healthWorkers(): User[] {
+  return USERS.filter((u) => u.role === "health_worker");
+}
+
+export function findUser(id: string): User | undefined {
+  return USERS.find((u) => u.id === id);
+}
