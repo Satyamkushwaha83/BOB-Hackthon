@@ -32,6 +32,16 @@ export const USERS: User[] = [
     createdAt: Date.now() - 1000 * 60 * 60 * 24 * 60,
   },
   {
+    id: "U5",
+    name: "Priya Kumari",
+    role: "health_worker",
+    email: "priya@clinic.demo",
+    password: "priya123",
+    phone: "+91 91234 99990",
+    clinicName: "Nandgaon Village Health Centre",
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 45,
+  },
+  {
     id: "U3",
     name: "Dr. Anita Verma",
     role: "doctor",
