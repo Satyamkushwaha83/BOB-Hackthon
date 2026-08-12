@@ -171,6 +171,18 @@ export function seedData(): { patients: Patient[]; consultations: Consultation[]
       notes: "General check-up requested by family.",
       createdAt: Date.now() - 1000 * 60 * 30,
     },
+    {
+      id: newId("A"),
+      patientId: patients[3].id,
+      healthWorkerId: "U2",
+      doctorId: "U3",
+      date: new Date(Date.now() + 1000 * 60 * 60 * 72).toISOString().slice(0, 10),
+      time: "10:00",
+      urgency: "routine",
+      status: "requested",
+      notes: "Routine anaemia follow-up — iron supplement check.",
+      createdAt: Date.now() - 1000 * 60 * 10,
+    },
   ];
 
   return { patients, consultations: [c1, c2, c3], appointments };
