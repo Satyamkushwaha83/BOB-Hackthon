@@ -59,6 +59,10 @@ export interface Vitals {
   bp: string;
   pulse: string;
   spo2: string;
+  /** Weight in kg — optional, helps dose calculations */
+  weight?: string;
+  /** Respiratory rate per minute */
+  rr?: string;
 }
 
 export interface Symptoms {
