@@ -1,9 +1,12 @@
 import React from "react";
 
+/** Brand green used across the logo and app */
+export const BRAND_GREEN = "#1d6f42";
+
 /**
  * Sehat-Sarthi brand logo.
- * A red cross/heart combined with a road/path motif — "health companion on your journey".
- * Pure SVG, no external deps.
+ * A heart with a medical cross on a brand-green circle, with a subtle
+ * road/path motif underneath representing "Sarthi" (companion/guide).
  */
 export function SehatSarthiLogo({
   size = 36,
@@ -21,37 +24,56 @@ export function SehatSarthiLogo({
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-label="Sehat-Sarthi logo"
+      role="img"
     >
       {/* Circular background */}
-      <circle cx="24" cy="24" r="23" fill="#1d6f42" />
+      <circle cx="24" cy="24" r="23" fill={BRAND_GREEN} />
 
-      {/* White road / path — two converging lines representing the "Sarthi" (companion/guide) */}
-      <path d="M18 42 L24 10 L30 42" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35" />
-
-      {/* Heart shape — representing "Sehat" (health) */}
+      {/* Subtle road/path — "Sarthi" motif */}
       <path
-        d="M24 34 C24 34 12 26.5 12 19.5 C12 15.9 14.9 13 18.5 13 C20.6 13 22.5 14.1 24 15.8 C25.5 14.1 27.4 13 29.5 13 C33.1 13 36 15.9 36 19.5 C36 26.5 24 34 24 34Z"
+        d="M18 43 L24 11 L30 43"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        opacity="0.25"
+      />
+
+      {/* Heart shape — "Sehat" motif */}
+      <path
+        d="M24 35 C24 35 11 27 11 19.5 C11 15.4 14.1 12 18.5 12 C20.8 12 22.8 13.2 24 15 C25.2 13.2 27.2 12 29.5 12 C33.9 12 37 15.4 37 19.5 C37 27 24 35 24 35Z"
         fill="white"
       />
 
       {/* Green cross inside heart */}
-      <rect x="22" y="18" width="4" height="10" rx="1" fill="#1d6f42" />
-      <rect x="19" y="21" width="10" height="4" rx="1" fill="#1d6f42" />
+      <rect x="21.5" y="17.5" width="5" height="11" rx="1.5" fill={BRAND_GREEN} />
+      <rect x="18.5" y="20.5" width="11" height="5" rx="1.5" fill={BRAND_GREEN} />
     </svg>
   );
 }
 
-/** Inline wordmark variant — logo + "Sehat-Sarthi" text side by side */
+/**
+ * Wordmark — logo icon + text label side by side.
+ * Use in headers and landing pages.
+ */
 export function SehatSarthiWordmark({
   size = 36,
+  label = "Sehat-Sarthi",
   className = "",
 }: {
   size?: number;
+  label?: string;
   className?: string;
 }) {
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <SehatSarthiLogo size={size} />
+      <span
+        style={{ fontSize: size * 0.44, fontWeight: 700, color: BRAND_GREEN, letterSpacing: "-0.01em" }}
+      >
+        {label}
+      </span>
     </div>
   );
 }
