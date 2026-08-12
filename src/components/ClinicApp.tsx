@@ -73,7 +73,8 @@ export function ClinicApp() {
   };
 
   const createAppointment = (data: Omit<Appointment, "id" | "createdAt" | "status">) => {
-    setAppointments((prev) => [...prev, { ...data, id: `AP${prev.length + 1 + Date.now()}`, createdAt: Date.now(), status: "requested" }]);
+    const id = `AP${Date.now().toString(36).toUpperCase()}`;
+    setAppointments((prev) => [...prev, { ...data, id, createdAt: Date.now(), status: "requested" }]);
   };
   const updateAppointmentStatus = (id: string, status: AppointmentStatus) => {
     setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
