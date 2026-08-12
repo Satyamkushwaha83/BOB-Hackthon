@@ -251,6 +251,37 @@ export const CONDITION_LIBRARY: ConditionEntry[] = [
     contraindications: ["Do not give anti-diarrhoeals (Loperamide) to children under 12 without doctor advice"],
   },
   {
+    id: "eye",
+    matchLabel: "Eye Redness / Discharge",
+    steps: [
+      "Do NOT rub the eye — this can worsen irritation or spread infection.",
+      "Wash hands thoroughly before touching near the eye.",
+      "Gently clean discharge with a clean, wet cloth (from inner to outer corner).",
+      "If caused by a chemical splash — rinse with clean water for 15 minutes and refer immediately.",
+      "If vision is affected, refer to doctor urgently.",
+    ],
+    otc: [
+      { name: "Normal saline (0.9%) eye drops", adultDose: "1-2 drops every 4-6 hrs to irrigate", childDose: "Same, with adult supervision", category: "topical", minAge: 0 },
+    ],
+    dangerSigns: ["Sudden loss of vision", "Severe eye pain", "Eye injury or foreign body not removable", "Chemical in eye"],
+    contraindications: ["Do not apply any oil or home remedy into the eye", "Avoid sharing eye drops (infection risk)"],
+  },
+  {
+    id: "ear-pain",
+    matchLabel: "Ear Pain",
+    steps: [
+      "Have the patient tilt their head to let any water drain out.",
+      "A warm (not hot) cloth held against the outer ear can ease pain.",
+      "Do NOT insert any object into the ear canal.",
+      "If there is discharge from the ear, do NOT block it — refer to doctor.",
+    ],
+    otc: [
+      { name: "Paracetamol 500mg (pain relief)", adultDose: "500mg every 6-8 hrs after food", childDose: "10-15mg/kg, doctor to confirm", category: "analgesic", minAge: 2 },
+    ],
+    dangerSigns: ["Discharge from the ear (especially if smelly or bloody)", "Sudden hearing loss", "Severe pain unrelieved by paracetamol", "Swelling or redness behind the ear"],
+    contraindications: ["Do not put oil, drops or any liquid in the ear without doctor advice — may worsen perforation"],
+  },
+  {
     id: "abdominal-pain",
     matchLabel: "Abdominal Pain",
     steps: [
