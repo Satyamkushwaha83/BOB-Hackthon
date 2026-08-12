@@ -365,6 +365,11 @@ const hi: Dict = {
   totalConsultations: "कुल परामर्श",
   urgentCases: "आपातकालीन मामले",
   avgVitalsFlagged: "जोखिम-संकेत वाले परामर्श",
+
+  village: "गाँव",
+  weight: "वज़न (kg)",
+  respiratoryRate: "श्वसन दर (प्रति मिनट)",
+  noVillage: "अनिर्दिष्ट",
 };
 
 const mr: Dict = {
@@ -529,6 +534,11 @@ const mr: Dict = {
   totalConsultations: "एकूण सल्लामसलती",
   urgentCases: "तातडीची प्रकरणे",
   avgVitalsFlagged: "जोखीम-संकेत असलेल्या सल्लामसलती",
+
+  village: "गाव",
+  weight: "वजन (kg)",
+  respiratoryRate: "श्वसन दर (प्रति मिनिट)",
+  noVillage: "अनिर्दिष्ट",
 };
 
 export const UI: Record<UILang, Dict> = { en, hi, mr };
