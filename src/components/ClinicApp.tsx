@@ -56,6 +56,7 @@ export function ClinicApp() {
   const handleLogout = () => {
     setCurrentUser(null);
     setActiveConsultationId(null);
+    setActiveSection("queue");
   };
 
   const startConsultation = (patientId: string) => {
