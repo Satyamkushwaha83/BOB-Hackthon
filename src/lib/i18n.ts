@@ -547,6 +547,18 @@ export function translate(lang: UILang, key: keyof Dict): string {
   return UI[lang][key] ?? UI.en[key];
 }
 
+/** Returns all available translation keys */
+export function translationKeys(): (keyof Dict)[] {
+  return Object.keys(UI.en) as (keyof Dict)[];
+}
+
+/** Returns all missing keys in a given language compared to English */
+export function missingTranslationKeys(lang: UILang): string[] {
+  const enKeys = Object.keys(UI.en);
+  const langKeys = new Set(Object.keys(UI[lang]));
+  return enKeys.filter((k) => !langKeys.has(k));
+}
+
 /**
  * Translated display text for the dedicated First-Aid & Medicine Guide
  * reference module, keyed by the same condition ids used in
