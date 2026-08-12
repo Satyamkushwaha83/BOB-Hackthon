@@ -28,7 +28,7 @@ export const RED_FLAGS = [
   { key: "severeAbdomen", label: "Severe abdominal pain (rigid belly)" },
 ];
 
-export function vitalStatus(type: "temp" | "pulse" | "spo2", raw: string): VitalStatus {
+export function vitalStatus(type: "temp" | "pulse" | "spo2" | "rr", raw: string): VitalStatus {
   const v = parseFloat(raw);
   if (isNaN(v)) return "normal";
   if (type === "temp") {
@@ -45,6 +45,11 @@ export function vitalStatus(type: "temp" | "pulse" | "spo2", raw: string): Vital
   if (type === "spo2") {
     if (v < 90) return "high";
     if (v < 95) return "mid";
+    return "normal";
+  }
+  if (type === "rr") {
+    if (v < 10 || v > 30) return "high";
+    if (v < 12 || v > 20) return "mid";
     return "normal";
   }
   return "normal";
