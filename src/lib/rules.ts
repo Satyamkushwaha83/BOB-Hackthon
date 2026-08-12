@@ -60,9 +60,19 @@ export function bpStatus(bp: string): VitalStatus {
   if (!m) return "normal";
   const sys = parseInt(m[1]);
   const dia = parseInt(m[2]);
-  if (sys > 180 || sys < 90 || dia > 120 || dia < 60) return "high";
-  if (sys >= 140 || sys < 100 || dia >= 90) return "mid";
+  if (sys > 180 || sys < 80 || dia > 120 || dia < 50) return "high";
+  if (sys >= 140 || sys < 90 || dia >= 90) return "mid";
   return "normal";
+}
+
+/**
+ * Returns true if the given bp string represents a hypertensive-crisis level (>= 180 systolic).
+ * Used to surface a specific warning in the triage summary.
+ */
+export function isHypertensiveCrisis(bp: string): boolean {
+  const m = (bp || "").match(/(\d+)\s*\/\s*(\d+)/);
+  if (!m) return false;
+  return parseInt(m[1]) >= 180 || parseInt(m[2]) >= 120;
 }
 
 export const statusColor: Record<VitalStatus, string> = {
