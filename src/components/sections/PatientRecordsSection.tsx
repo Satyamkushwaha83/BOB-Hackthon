@@ -20,7 +20,12 @@ export function PatientRecordsSection({
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const filtered = patients.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()) || p.phone.includes(query));
+  const filtered = patients.filter(
+    (p) =>
+      p.name.toLowerCase().includes(query.toLowerCase()) ||
+      p.phone.includes(query) ||
+      (p.village || "").toLowerCase().includes(query.toLowerCase())
+  );
   const selected = patients.find((p) => p.id === selectedId) || null;
   const history = selected ? consultations.filter((c) => c.patientId === selected.id).sort((a, b) => b.createdAt - a.createdAt) : [];
 
@@ -50,7 +55,9 @@ export function PatientRecordsSection({
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
                 <h3 className="font-bold text-lg text-slate-800">{selected.name}</h3>
                 <p className="text-sm text-slate-500 mb-3">
-                  {selected.age}y · {selected.gender} · {selected.language} · {selected.phone || "no phone"}
+                  {selected.age}y · {selected.gender} · {selected.language}
+                  {selected.village && ` · ${selected.village}`}
+                  {" · "}{selected.phone || "no phone"}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                   <div className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
