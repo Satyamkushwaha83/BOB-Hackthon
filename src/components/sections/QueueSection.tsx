@@ -44,11 +44,14 @@ export function QueueSection({
     done: "bg-emerald-100 text-emerald-700",
   };
 
+  const totalPatients = new Set(consultations.map((c) => c.patientId)).size;
+
   const stats = [
     { label: t("urgent"), n: consultations.filter((c) => c.triage?.level === "urgent").length, color: "bg-red-600" },
     { label: t("doctorReview"), n: consultations.filter((c) => c.triage?.level === "amber").length, color: "bg-amber-500" },
     { label: t("routine"), n: consultations.filter((c) => c.triage?.level === "routine").length, color: "bg-emerald-600" },
     { label: t("completedToday"), n: consultations.filter((c) => c.status === "done").length, color: "bg-slate-500" },
+    { label: "Total Patients", n: totalPatients, color: "bg-blue-600" },
   ];
 
   return (
