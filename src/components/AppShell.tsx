@@ -113,8 +113,10 @@ export function AppShell({
     </div>
   );
 
+  const pageTitle = `Sehat-Sarthi — ${t(nav.find((n) => n.id === active)?.labelKey ?? "appName")}`;
+
   return (
-    <div className="min-h-screen flex bg-slate-100">
+    <div className="min-h-screen flex bg-slate-100" data-page={active}>
       {/* Desktop / tablet sidebar */}
       <aside className={`hidden md:flex flex-col bg-white border-r border-slate-200 sticky top-0 h-screen transition-all ${collapsed ? "w-20" : "w-64"}`}>{sidebarContent}</aside>
 
