@@ -13,6 +13,7 @@ export function blankPatient(createdBy: string): Patient {
     gender: "Male",
     language: "Hindi",
     phone: "",
+    village: "",
     history: { allergies: "", conditions: "", medications: "" },
     createdAt: Date.now(),
     createdBy,
