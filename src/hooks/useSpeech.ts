@@ -45,7 +45,7 @@ export function useSpeechToText(lang: string) {
           .join(" ");
         onResult(text);
       };
-      rec.onerror = () => setListening(false);
+      rec.onerror = (e) => { console.warn("SpeechRecognition error", e.error); setListening(false); };
       rec.onend = () => setListening(false);
       recognitionRef.current = rec;
       setListening(true);
