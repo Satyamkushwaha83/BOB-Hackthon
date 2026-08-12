@@ -80,6 +80,9 @@ export function ClinicApp() {
   const updateAppointmentStatus = (id: string, status: AppointmentStatus) => {
     setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
   };
+  const cancelAppointment = (id: string) => {
+    setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "cancelled" as AppointmentStatus } : a)));
+  };
 
   if (!currentUser) {
     return <LoginScreen uiLang={uiLang} setUiLang={setUiLang} onLogin={handleLogin} />;
