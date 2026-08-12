@@ -193,6 +193,12 @@ const en = {
   totalConsultations: "Total Consultations",
   urgentCases: "Urgent Cases",
   avgVitalsFlagged: "Consultations With Risk Flags",
+
+  // Village/patient extras
+  village: "Village",
+  weight: "Weight (kg)",
+  respiratoryRate: "Resp. Rate (per min)",
+  noVillage: "Not specified",
 };
 
 type Dict = typeof en;
