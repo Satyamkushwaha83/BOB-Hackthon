@@ -8,10 +8,11 @@ function ensureStarted() {
   if (started) return;
   started = true;
   cached = Date.now();
+  cached = Date.now();
   setInterval(() => {
     cached = Date.now();
     listeners.forEach((l) => l());
-  }, 30000);
+  }, 60000); // refresh every 60s — sufficient for wait-time display
 }
 
 function subscribe(callback: () => void) {
