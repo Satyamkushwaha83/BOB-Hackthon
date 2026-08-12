@@ -1,7 +1,8 @@
 import { Appointment, Consultation, Patient } from "./types";
 import { computeTriage, getFirstAid } from "./rules";
 
-let idCounter = 100;
+let idCounter = 1000;
+/** Generates a unique prefixed id (e.g. "PT1001"). Starts at 1000 to avoid collisions with legacy seeds. */
 export const newId = (prefix: string) => `${prefix}${++idCounter}`;
 
 export function blankPatient(createdBy: string): Patient {
