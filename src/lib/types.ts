@@ -176,3 +176,22 @@ export interface Appointment {
 
 export type UILang = "en" | "hi" | "mr";
 export type VitalStatus = "normal" | "mid" | "high" | "low";
+
+/** Generic paginated result shape — ready for API integration */
+export interface PaginatedResult<T> {
+  items: T[];
+  total: number;
+  page: number;
+  perPage: number;
+}
+
+/** Audit log entry — every state change that matters clinically */
+export interface AuditEntry {
+  id: string;
+  entityType: "consultation" | "patient" | "appointment";
+  entityId: string;
+  action: string;
+  by: string;
+  at: number;
+  note?: string;
+}
