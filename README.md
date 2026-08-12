@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sehat-Sarthi — AI-Powered Virtual Village Clinic
 
-## Getting Started
+**Sehat-Sarthi** ("Health Companion") is an open-source, AI-assisted prototype for rural health workers and remote doctors in India. It is designed to run entirely in-browser (no server required) and supports Hindi, Marathi, and English.
 
-First, run the development server:
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| **Patient Queue** | Live dashboard of waiting, in-progress and completed consultations |
+| **Patient Intake** | Structured symptom capture with red-flag detection |
+| **AI Triage** | Rule-based triage engine (urgent / amber / routine) |
+| **First-Aid Guide** | Safe, condition-specific first-aid and OTC medicine guidance |
+| **Doctor Consultation** | Simulated remote video-consult screen with doctor sign-off |
+| **Patient Records** | Full consultation history per patient |
+| **Appointments** | Booking and status management |
+| **Analytics** | Consultation trend charts for clinic managers |
+| **Multi-language** | English · हिंदी · मराठी UI with one-click switching |
+
+---
+
+## 🚀 Getting Started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Demo Accounts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Role | Email | Password |
+|------|-------|----------|
+| Health Worker | asha@clinic.demo | asha123 |
+| Health Worker | manoj@clinic.demo | manoj123 |
+| Health Worker | priya@clinic.demo | priya123 |
+| Doctor | anita@clinic.demo | doctor123 |
+| Doctor | farhan@clinic.demo | doctor123 |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗 Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Next.js 16** (App Router)
+- **React 19**
+- **Tailwind CSS v4**
+- **TypeScript**
+- All data is **in-memory** — no database or backend required for the prototype
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 📁 Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/          # Next.js App Router entry points
+  components/   # UI components (AppShell, LoginScreen, sections, consultation flow)
+  hooks/        # useSpeech — Web Speech API wrapper
+  lib/          # Business logic: types, rules, i18n, seed data, auth, dates
+  types/        # Global TypeScript ambient declarations
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## ⚠️ Disclaimer
+
+This is a **hackathon prototype**. All patient data is simulated in-memory and reset on every page refresh. It is **not a medical device** and must not be used for real clinical decisions without proper validation and regulatory approval.
+
+---
+
+## 📄 License
+
+MIT
