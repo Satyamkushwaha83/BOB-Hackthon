@@ -11,6 +11,11 @@ export const SYMPTOM_OPTIONS = [
   "Skin Rash",
   "Minor Burn",
   "Weakness / Fatigue",
+  "Eye Redness / Discharge",
+  "Ear Pain",
+  "Toothache / Mouth Pain",
+  "Abdominal Pain",
+  "Urinary Complaint",
 ];
 
 export const RED_FLAGS = [
