@@ -31,18 +31,25 @@ export function DisclaimerBar({ lang, compact }: { lang: UILang; compact?: boole
   );
 }
 
-const TRIAGE_MAP: Record<TriageLevel, { bg: string; text: string; icon: string }> = {
-  urgent: { bg: "bg-red-600", text: "URGENT — Refer to Hospital Immediately", icon: "🔴" },
-  amber: { bg: "bg-amber-500", text: "Needs Remote Doctor Review", icon: "🟠" },
-  routine: { bg: "bg-emerald-600", text: "Routine — Manageable at Health Centre", icon: "🟢" },
+const TRIAGE_MAP: Record<TriageLevel, { bg: string; text: string; icon: string; short: string }> = {
+  urgent: { bg: "bg-red-600", text: "URGENT — Refer to Hospital Immediately", icon: "🔴", short: "Urgent" },
+  amber: { bg: "bg-amber-500", text: "Needs Remote Doctor Review", icon: "🟠", short: "Doctor Review" },
+  routine: { bg: "bg-emerald-600", text: "Routine — Manageable at Health Centre", icon: "🟢", short: "Routine" },
 };
 
-export function TriageBadge({ level, size }: { level: TriageLevel; size?: "sm" }) {
+export function TriageBadge({ level, size }: { level: TriageLevel; size?: "sm" | "xs" }) {
   const c = TRIAGE_MAP[level] || TRIAGE_MAP.routine;
+  if (size === "xs") {
+    return (
+      <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 ${c.bg} text-white font-bold rounded-full`}>
+        {c.icon} {c.short}
+      </span>
+    );
+  }
   const sz = size === "sm" ? "text-xs px-2 py-1" : "text-sm px-4 py-2";
   return (
     <span className={`inline-flex items-center gap-2 ${c.bg} text-white font-bold rounded-full ${sz}`}>
-      {c.icon} {c.text}
+      {c.icon} {size === "sm" ? c.short : c.text}
     </span>
   );
 }
