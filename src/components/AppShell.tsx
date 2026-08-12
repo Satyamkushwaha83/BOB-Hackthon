@@ -146,6 +146,9 @@ export function AppShell({
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6">{children}</main>
+        <footer className="text-center text-[10px] text-slate-400 py-2 border-t border-slate-200 bg-white">
+          Sehat-Sarthi · AI-Powered Virtual Village Clinic · prototype
+        </footer>
       </div>
     </div>
   );
