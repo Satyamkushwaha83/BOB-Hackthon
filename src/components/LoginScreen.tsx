@@ -4,6 +4,7 @@ import { useState } from "react";
 import { login, USERS } from "@/lib/auth";
 import { LANG_LABEL, translate } from "@/lib/i18n";
 import { Role, UILang, User } from "@/lib/types";
+import { SehatSarthiLogo } from "@/components/SehatSarthiLogo";
 
 export function LoginScreen({ uiLang, setUiLang, onLogin }: { uiLang: UILang; setUiLang: (l: UILang) => void; onLogin: (u: User) => void }) {
   const [role, setRole] = useState<Role | null>(null);
@@ -36,7 +37,7 @@ export function LoginScreen({ uiLang, setUiLang, onLogin }: { uiLang: UILang; se
       </div>
 
       <div className="flex items-center gap-3 mb-8">
-        <span className="text-4xl">🏥</span>
+        <SehatSarthiLogo size={52} />
         <div>
           <p className="text-2xl font-bold text-slate-800 leading-tight">{t("appName")}</p>
           <p className="text-sm text-slate-500 leading-tight">{t("tagline")}</p>

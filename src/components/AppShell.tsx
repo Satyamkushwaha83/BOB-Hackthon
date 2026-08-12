@@ -3,6 +3,7 @@
 import { ReactNode, useState } from "react";
 import { LANG_LABEL, translate } from "@/lib/i18n";
 import { UILang, User } from "@/lib/types";
+import { SehatSarthiLogo } from "@/components/SehatSarthiLogo";
 
 export type HWSection = "queue" | "intake" | "records" | "firstaid-guide" | "doctor-consult" | "appointments";
 export type DocSection = "cases" | "records" | "review" | "appointments" | "analytics";
@@ -58,7 +59,7 @@ export function AppShell({
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className={`flex items-center gap-2 px-4 py-4 border-b border-slate-200 ${collapsed ? "justify-center" : ""}`}>
-        <span className="text-2xl shrink-0">💓</span>
+        <SehatSarthiLogo size={collapsed ? 32 : 36} className="shrink-0" />
         {!collapsed && (
           <div className="min-w-0">
             <p className="font-bold text-slate-800 leading-tight truncate">{t("appName")}</p>

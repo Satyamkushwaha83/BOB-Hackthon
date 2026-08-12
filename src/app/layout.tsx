@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gram Swasthya — AI Virtual Village Clinic",
-  description: "AI-powered virtual village clinic prototype for rural health workers",
+  title: "Sehat-Sarthi — AI Virtual Village Clinic",
+  description: "AI-powered virtual village clinic for rural health workers",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
