@@ -1,30 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { login, USERS } from "@/lib/auth";
 import { LANG_LABEL, translate } from "@/lib/i18n";
 import { Role, UILang, User } from "@/lib/types";
 import { SehatSarthiLogo } from "@/components/SehatSarthiLogo";
+import { apiLogin } from "@/lib/api";
+
+// Demo accounts shown as quick-fill buttons (no real password exposed)
+const DEMO_ACCOUNTS: { role: Role; name: string; email: string; password: string }[] = [
+  { role: "health_worker", name: "Asha Devi",        email: "asha@clinic.demo",   password: "asha123"   },
+  { role: "health_worker", name: "Manoj Pawar",      email: "manoj@clinic.demo",  password: "manoj123"  },
+  { role: "health_worker", name: "Priya Kumari",     email: "priya@clinic.demo",  password: "priya123"  },
+  { role: "doctor",        name: "Dr. Anita Verma",  email: "anita@clinic.demo",  password: "doctor123" },
+  { role: "doctor",        name: "Dr. Farhan Sheikh", email: "farhan@clinic.demo", password: "doctor123" },
+];
 
 export function LoginScreen({ uiLang, setUiLang, onLogin }: { uiLang: UILang; setUiLang: (l: UILang) => void; onLogin: (u: User) => void }) {
-  const [role, setRole] = useState<Role | null>(null);
-  const [email, setEmail] = useState("");
+  const [role, setRole]       = useState<Role | null>(null);
+  const [email, setEmail]     = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError]     = useState("");
+  const [loading, setLoading] = useState(false);
   const t = (k: Parameters<typeof translate>[1]) => translate(uiLang, k);
 
-  const submit = () => {
-    if (!role) return;
-    const user = login(email, password, role);
-    if (!user) {
-      setError(t("invalidCredentials"));
-      return;
-    }
+  const submit = async () => {
+    if (!role || !email || !password) return;
+    setLoading(true);
     setError("");
-    onLogin(user);
+    try {
+      const user = await apiLogin(email, password);
+      if (user.role !== role) {
+        setError(t("invalidCredentials"));
+        return;
+      }
+      onLogin(user);
+    } catch {
+      setError(t("invalidCredentials"));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const demoUsers = USERS.filter((u) => u.role === role);
+  const demoUsers = DEMO_ACCOUNTS.filter((u) => u.role === role);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 px-4">
@@ -84,15 +101,15 @@ export function LoginScreen({ uiLang, setUiLang, onLogin }: { uiLang: UILang; se
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} className="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="••••••••" />
               </div>
               {error && <p className="text-xs text-red-600 font-semibold">{error}</p>}
-              <button onClick={submit} className={`w-full font-semibold text-white rounded-lg py-2.5 ${role === "doctor" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-blue-600 hover:bg-blue-700"}`}>
-                {t("signIn")}
+              <button onClick={submit} disabled={loading || !email || !password} className={`w-full font-semibold text-white rounded-lg py-2.5 disabled:opacity-60 ${role === "doctor" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-blue-600 hover:bg-blue-700"}`}>
+                {loading ? "Signing in…" : t("signIn")}
               </button>
             </div>
             <div className="mt-5 pt-4 border-t border-slate-100">
               <p className="text-xs font-semibold text-slate-400 mb-2">{t("demoAccounts")}</p>
               <div className="flex flex-wrap gap-2">
                 {demoUsers.map((u) => (
-                  <button key={u.id} onClick={() => { setEmail(u.email); setPassword(u.password); setError(""); }} className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1.5 text-left">
+                  <button key={u.email} onClick={() => { setEmail(u.email); setPassword(u.password); setError(""); }} className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1.5 text-left">
                     <span className="block font-semibold text-slate-700">{u.name}</span>
                     <span className="block text-slate-400">{u.email}</span>
                   </button>
@@ -103,7 +120,7 @@ export function LoginScreen({ uiLang, setUiLang, onLogin }: { uiLang: UILang; se
         )}
       </div>
       <p className="text-xs text-slate-400 mt-6 text-center max-w-md">
-        Sehat-Sarthi prototype · accounts and data are simulated in-memory, not a real database.
+        Sehat-Sarthi · data persists in SQLite — demo accounts above.
       </p>
     </div>
   );
