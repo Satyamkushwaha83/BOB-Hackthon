@@ -108,8 +108,8 @@ function seedIfEmpty() {
     { id: "U1", name: "Asha Devi",       role: "health_worker", email: "asha@clinic.demo",   pw: "asha123",   phone: "+91 98765 43210", clinic: "Rampur Village Health Centre", spec: null,                created_at: now - 90 * day },
     { id: "U2", name: "Manoj Pawar",     role: "health_worker", email: "manoj@clinic.demo",  pw: "manoj123",  phone: "+91 91234 56780", clinic: "Sonapur Village Health Centre", spec: null,                created_at: now - 60 * day },
     { id: "U5", name: "Priya Kumari",    role: "health_worker", email: "priya@clinic.demo",  pw: "priya123",  phone: "+91 91234 99990", clinic: "Nandgaon Village Health Centre", spec: null,               created_at: now - 45 * day },
-    { id: "U3", name: "Dr. Anita Verma", role: "doctor",        email: "anita@clinic.demo",  pw: "doctor123", phone: "+91 99887 66554", clinic: null, spec: "General Physician",    created_at: now - 200 * day },
-    { id: "U4", name: "Dr. Farhan Sheikh",role:"doctor",        email: "farhan@clinic.demo", pw: "doctor123", phone: "+91 90000 11223", clinic: null, spec: "Internal Medicine",    created_at: now - 150 * day },
+    { id: "U3", name: "Dr. Anita Verma", role: "doctor",        email: "anita@clinic.demo",  pw: "doctor123", phone: "+91 63872 24435", clinic: null, spec: "General Physician",    created_at: now - 200 * day },
+    { id: "U4", name: "Dr. Farhan Sheikh",role:"doctor",        email: "farhan@clinic.demo", pw: "doctor123", phone: "+91 93053 04825", clinic: null, spec: "Internal Medicine",    created_at: now - 150 * day },
   ];
 
   for (const u of users) {
