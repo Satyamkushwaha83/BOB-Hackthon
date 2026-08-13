@@ -115,7 +115,16 @@ export function ClinicApp() {
         />
       ) : currentUser.role === "doctor" ? (
         <>
-          {activeSection === "cases" && <DoctorCasesSection consultations={consultations} patients={patients} uiLang={uiLang} onOpen={setActiveConsultationId} />}
+          {activeSection === "cases" && (
+            <DoctorCasesSection
+              consultations={consultations}
+              appointments={appointments.filter((a) => a.doctorId === currentUser.id)}
+              patients={patients}
+              uiLang={uiLang}
+              onOpenConsultation={setActiveConsultationId}
+              onUpdateAppointmentStatus={updateAppointmentStatus}
+            />
+          )}
           {activeSection === "records" && <PatientRecordsSection patients={patients} consultations={consultations} uiLang={uiLang} onOpenConsultation={setActiveConsultationId} />}
           {activeSection === "review" && <ConsultationReviewSection consultations={consultations} patients={patients} uiLang={uiLang} onOpen={setActiveConsultationId} />}
           {activeSection === "appointments" && (
