@@ -6,6 +6,57 @@ import { Consultation, Patient, UILang } from "@/lib/types";
 import { RED_FLAGS, SYMPTOM_OPTIONS, bpStatus, statusColor, vitalStatus } from "@/lib/rules";
 import { MicButton } from "../ui";
 
+// ── Vital-sign validation ─────────────────────────────────────────────────────
+
+type VitalKey = "temp" | "bp" | "pulse" | "spo2";
+type VitalValidation = "empty" | "valid" | "invalid";
+
+function validateTemp(raw: string): VitalValidation {
+  if (!raw.trim()) return "empty";
+  const n = parseFloat(raw);
+  if (isNaN(n)) return "invalid";
+  return n >= 90 && n <= 105 ? "valid" : "invalid";
+}
+
+function validateBP(raw: string): VitalValidation {
+  if (!raw.trim()) return "empty";
+  const m = raw.match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (!m) return "invalid";
+  const sys = parseInt(m[1], 10);
+  const dia = parseInt(m[2], 10);
+  return sys >= 70 && sys <= 250 && dia >= 40 && dia <= 150 ? "valid" : "invalid";
+}
+
+function validatePulse(raw: string): VitalValidation {
+  if (!raw.trim()) return "empty";
+  const n = parseInt(raw, 10);
+  if (isNaN(n)) return "invalid";
+  return n >= 30 && n <= 220 ? "valid" : "invalid";
+}
+
+function validateSpo2(raw: string): VitalValidation {
+  if (!raw.trim()) return "empty";
+  const n = parseFloat(raw);
+  if (isNaN(n)) return "invalid";
+  return n >= 50 && n <= 100 ? "valid" : "invalid";
+}
+
+function validateVital(key: VitalKey, raw: string): VitalValidation {
+  switch (key) {
+    case "temp":  return validateTemp(raw);
+    case "bp":    return validateBP(raw);
+    case "pulse": return validatePulse(raw);
+    case "spo2":  return validateSpo2(raw);
+  }
+}
+
+const VITAL_HINT: Record<VitalKey, string> = {
+  temp:  "90 – 105 °F",
+  bp:    "Systolic 70–250 / Diastolic 40–150",
+  pulse: "30 – 220 bpm",
+  spo2:  "50 – 100 %",
+};
+
 export function VisitIntakeForm({
   patient,
   updatePatient,
@@ -56,7 +107,20 @@ export function VisitIntakeForm({
     });
   };
 
-  const canSubmit = consultation.symptoms.structured.length > 0 || Boolean(consultation.symptoms.freeText);
+  // Vitals validation — block submission if any *entered* vital is out of range
+  const vitalsValidity: Record<VitalKey, VitalValidation> = {
+    temp:  validateVital("temp",  consultation.vitals.temp),
+    bp:    validateVital("bp",    consultation.vitals.bp),
+    pulse: validateVital("pulse", consultation.vitals.pulse),
+    spo2:  validateVital("spo2",  consultation.vitals.spo2),
+  };
+  const vitalsHaveError = (Object.keys(vitalsValidity) as VitalKey[]).some(
+    (k) => vitalsValidity[k] === "invalid"
+  );
+
+  const canSubmit =
+    (consultation.symptoms.structured.length > 0 || Boolean(consultation.symptoms.freeText)) &&
+    !vitalsHaveError;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
@@ -116,27 +180,56 @@ export function VisitIntakeForm({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {(
             [
-              { key: "temp", label: "Temperature (°F)", ph: "98.6" },
-              { key: "bp", label: "Blood Pressure (mmHg)", ph: "120/80" },
-              { key: "pulse", label: "Pulse (bpm)", ph: "72" },
-              { key: "spo2", label: "SpO2 (%)", ph: "98" },
+              { key: "temp",  label: "Temperature (°F)",    ph: "98.6"   },
+              { key: "bp",    label: "Blood Pressure (mmHg)", ph: "120/80" },
+              { key: "pulse", label: "Pulse (bpm)",          ph: "72"     },
+              { key: "spo2",  label: "SpO₂ (%)",             ph: "98"     },
             ] as const
           ).map((v) => {
             const raw = consultation.vitals[v.key];
-            const st = v.key === "bp" ? bpStatus(raw) : vitalStatus(v.key, raw);
+            const st   = v.key === "bp" ? bpStatus(raw) : vitalStatus(v.key, raw);
+            const vv   = vitalsValidity[v.key];
             return (
               <div key={v.key}>
                 <label className="text-xs text-slate-500">{v.label}</label>
-                <input
-                  value={raw}
-                  onChange={(e) => updateConsultation((d) => { d.vitals[v.key] = e.target.value; })}
-                  placeholder={v.ph}
-                  className={`mt-1 w-full border rounded-lg px-3 py-2 text-sm font-semibold ${statusColor[st]}`}
-                />
+                <div className="relative mt-1">
+                  <input
+                    value={raw}
+                    onChange={(e) => updateConsultation((d) => { d.vitals[v.key] = e.target.value; })}
+                    placeholder={v.ph}
+                    className={`w-full border rounded-lg px-3 py-2 text-sm font-semibold pr-8 ${
+                      vv === "invalid"
+                        ? "border-red-400 bg-red-50 text-red-700 focus:ring-red-300"
+                        : vv === "valid"
+                        ? "border-emerald-400 bg-emerald-50 text-emerald-800 focus:ring-emerald-300"
+                        : statusColor[st]
+                    } focus:outline-none focus:ring-2`}
+                  />
+                  {vv !== "empty" && (
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-base pointer-events-none select-none">
+                      {vv === "valid" ? "✅" : "❌"}
+                    </span>
+                  )}
+                </div>
+                {vv === "invalid" && (
+                  <p className="text-[11px] text-red-600 mt-0.5 leading-tight">
+                    Allowed: {VITAL_HINT[v.key]}
+                  </p>
+                )}
+                {vv === "valid" && (
+                  <p className="text-[11px] text-emerald-600 mt-0.5 leading-tight">
+                    Within normal range
+                  </p>
+                )}
               </div>
             );
           })}
         </div>
+        {vitalsHaveError && (
+          <p className="mt-3 text-xs font-semibold text-red-600 flex items-center gap-1.5">
+            ❌ Fix out-of-range vitals before submitting.
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
