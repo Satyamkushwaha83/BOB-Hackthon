@@ -13,7 +13,8 @@ export function FirstAidGuideSection({ uiLang }: { uiLang: UILang }) {
   const [ack, setAck] = useState<Record<string, boolean>>({});
 
   const guide = GUIDE_CONTENT[uiLang];
-  const items = CONDITION_LIBRARY.filter((c) => (guide[c.id]?.title || c.matchLabel).toLowerCase().includes(query.toLowerCase()));
+  // Only show conditions that have guide content for the current language
+  const items = CONDITION_LIBRARY.filter((c) => guide[c.id] && (guide[c.id].title || c.matchLabel).toLowerCase().includes(query.toLowerCase()));
 
   return (
     <div className="max-w-4xl mx-auto space-y-5">
@@ -36,6 +37,7 @@ export function FirstAidGuideSection({ uiLang }: { uiLang: UILang }) {
         {items.map((c) => {
           const content = guide[c.id];
           const isOpen = openId === c.id;
+          if (!content) return null;
           const stepsText = content.steps.join(". ");
           const acknowledged = !!ack[c.id];
           return (

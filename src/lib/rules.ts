@@ -1,4 +1,4 @@
-import { FirstAid, History, OTCItem, Symptoms, Triage, Vitals, VitalStatus } from "./types";
+import { FirstAid, History, OTCItem, Patient, Symptoms, Triage, Vitals, VitalStatus } from "./types";
 
 export const SYMPTOM_OPTIONS = [
   "Fever",
@@ -96,42 +96,325 @@ interface TriageInput {
 }
 
 export function computeTriage(p: TriageInput): Triage {
-  const temp = parseFloat(p.vitals.temp);
-  const spo2 = parseFloat(p.vitals.spo2);
+  const temp  = parseFloat(p.vitals.temp);
+  const spo2  = parseFloat(p.vitals.spo2);
   const pulse = parseFloat(p.vitals.pulse);
-  const m = (p.vitals.bp || "").match(/(\d+)\s*\/\s*(\d+)/);
+  const m   = (p.vitals.bp || "").match(/(\d+)\s*\/\s*(\d+)/);
   const sys = m ? parseInt(m[1]) : null;
   const dia = m ? parseInt(m[2]) : null;
-  const f = p.symptoms.flags || [];
+  const f   = p.symptoms.flags || [];
+  const s   = p.symptoms.structured || [];
 
+  const push = (arr: string[], cond: boolean, msg: string) => { if (cond) arr.push(msg); };
+
+  // ── EMERGENCY thresholds (from Prompt 1) ─────────────────────────
   const urgentReasons: string[] = [];
-  const push = (arr: string[], cond: boolean, msg: string) => {
-    if (cond) arr.push(msg);
-  };
+  push(urgentReasons, !isNaN(spo2) && spo2 < 92,               `SpO₂ critically low (${spo2}%)`);
+  push(urgentReasons, !isNaN(temp) && temp > 105,               `Temperature dangerously high (${temp}°F)`);
+  push(urgentReasons, sys !== null && sys < 90,                  `BP systolic critically low (${sys} mmHg) — possible shock`);
+  push(urgentReasons, dia !== null && dia < 60,                  `BP diastolic critically low (${dia} mmHg)`);
+  push(urgentReasons, !isNaN(pulse) && (pulse < 40 || pulse > 130), `Pulse critically abnormal (${pulse} bpm)`);
+  push(urgentReasons, f.includes("chestPain"),                   "Chest pain reported");
+  push(urgentReasons, f.includes("breathlessness"),              "Severe breathing difficulty reported");
+  push(urgentReasons, f.includes("heavyBleeding"),               "Severe / uncontrolled bleeding reported");
+  push(urgentReasons, f.includes("unconscious"),                 "Unconscious / not responding");
+  push(urgentReasons, f.includes("seizure"),                     "Seizure / convulsions reported");
+  push(urgentReasons, f.includes("severeAbdomen"),               "Severe abdominal rigidity reported");
+  push(urgentReasons, f.includes("confusion") && !isNaN(temp) && temp > 103, `High fever (${temp}°F) with confusion`);
 
-  push(urgentReasons, !isNaN(spo2) && spo2 < 90, `SpO2 critically low (${spo2}%)`);
-  push(urgentReasons, !isNaN(temp) && temp >= 104 && f.includes("confusion"), `High fever (${temp}°F) with confusion`);
-  push(urgentReasons, sys !== null && (sys > 180 || sys < 90), `BP systolic extreme (${sys} mmHg)`);
-  push(urgentReasons, dia !== null && (dia > 120 || dia < 60), `BP diastolic extreme (${dia} mmHg)`);
-  push(urgentReasons, !isNaN(pulse) && (pulse < 40 || pulse > 130), `Pulse abnormal (${pulse} bpm)`);
-  push(urgentReasons, f.includes("chestPain"), "Chest pain reported");
-  push(urgentReasons, f.includes("breathlessness"), "Severe breathlessness reported");
-  push(urgentReasons, f.includes("heavyBleeding"), "Heavy / uncontrolled bleeding reported");
-  push(urgentReasons, f.includes("unconscious"), "Unconscious / unresponsive");
-  push(urgentReasons, f.includes("seizure"), "Seizure / convulsions reported");
-  push(urgentReasons, f.includes("severeAbdomen"), "Severe abdominal rigidity reported");
-
+  // ── MEDIUM (amber) thresholds (from Prompt 1) ────────────────────
   const amberReasons: string[] = [];
-  push(amberReasons, f.includes("confusion"), "Confusion / altered mental state reported");
-  push(amberReasons, !isNaN(spo2) && spo2 >= 90 && spo2 < 95, `SpO2 mildly low (${spo2}%)`);
-  push(amberReasons, !isNaN(temp) && temp >= 102 && temp < 104, `Moderate-high fever (${temp}°F)`);
-  push(amberReasons, sys !== null && ((sys >= 140 && sys <= 180) || (sys >= 90 && sys < 100)), `BP outside normal range (${sys} systolic)`);
-  push(amberReasons, dia !== null && dia >= 90 && dia <= 120, `BP diastolic elevated (${dia})`);
-  push(amberReasons, !isNaN(pulse) && ((pulse >= 100 && pulse <= 130) || (pulse >= 40 && pulse < 50)), `Pulse outside normal range (${pulse} bpm)`);
+  push(amberReasons, !isNaN(temp) && temp > 101 && temp <= 105,   `Fever present (${temp}°F)`);
+  push(amberReasons, f.includes("confusion"),                     "Confusion / altered mental state");
+  push(amberReasons, !isNaN(spo2) && spo2 >= 92 && spo2 < 95,   `SpO₂ mildly low (${spo2}%)`);
+  push(amberReasons, !isNaN(pulse) && pulse > 100 && pulse <= 130, `Elevated pulse (${pulse} bpm)`);
+  push(amberReasons, !isNaN(pulse) && pulse >= 40 && pulse < 55,  `Low pulse (${pulse} bpm)`);
+  push(amberReasons, sys !== null && sys >= 140,                  `Elevated BP (${sys}/${dia} mmHg)`);
+  push(amberReasons, s.includes("Weakness / Fatigue"),            "Moderate weakness reported");
+  push(amberReasons, s.includes("Minor Cut / Wound"),             "Wound — monitor for infection (swelling/redness/discharge)");
+  push(amberReasons, s.includes("Vomiting") || s.includes("Diarrhea"), "Vomiting / diarrhea — assess for dehydration");
 
   if (urgentReasons.length > 0) return { level: "urgent", reasons: urgentReasons };
-  if (amberReasons.length > 0) return { level: "amber", reasons: amberReasons };
-  return { level: "routine", reasons: ["All recorded vitals within normal range; symptoms consistent with a minor / routine condition."] };
+  if (amberReasons.length > 0)  return { level: "amber",  reasons: amberReasons  };
+  return { level: "routine", reasons: ["All vitals within normal range; symptoms consistent with a minor/routine condition."] };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROMPT 1 — AI Triage Summary (for health worker)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface TriageSummaryInput {
+  patient: Patient;
+  vitals: Vitals;
+  symptoms: Symptoms;
+  triage: Triage;
+  triageOverride?: { level: string; reason: string } | null;
+}
+
+function yn(val: boolean) { return val ? "Yes" : "No"; }
+function chk(val: boolean) { return val ? "✅" : "❌"; }
+
+export function buildTriageSummary(input: TriageSummaryInput): string {
+  const { patient, vitals, symptoms, triage, triageOverride } = input;
+  const level = triageOverride ? triageOverride.level : triage.level;
+
+  const badge =
+    level === "urgent" ? "🔴 Emergency Risk" :
+    level === "amber"  ? "🟡 Medium Risk"    : "🟢 Low Risk";
+
+  const temp  = parseFloat(vitals.temp);
+  const spo2  = parseFloat(vitals.spo2);
+  const pulse = parseFloat(vitals.pulse);
+  const f     = symptoms.flags || [];
+  const s     = symptoms.structured || [];
+
+  // Parse duration for "fever > 2 days" check
+  const durText = (symptoms.duration || "").toLowerCase();
+  const durationDays = durText.includes("day") ? parseInt(durText) || 0 : 0;
+
+  // Safety checklist booleans
+  const tempOk      = isNaN(temp)  || temp <= 105;
+  const spo2Ok      = isNaN(spo2)  || spo2 >= 92;
+  const noBreathing = !f.includes("breathlessness");
+  const noChest     = !f.includes("chestPain");
+  const conscious   = !f.includes("unconscious");
+  const noBleeding  = !f.includes("heavyBleeding");
+  const noSeizure   = !f.includes("seizure");
+
+  const hasFever    = !isNaN(temp) && temp > 101;
+  const hasWeakness = s.includes("Weakness / Fatigue");
+  const hasWound    = s.includes("Minor Cut / Wound");
+
+  // Medical history parsing
+  const cond = (patient.history.conditions || "").toLowerCase();
+  const hasDM   = cond.includes("diabet");
+  const hasHTN  = cond.includes("hypertens") || cond.includes("bp") || cond.includes("blood pressure");
+  const hasHeart= cond.includes("heart") || cond.includes("cardiac");
+  const hasAsthma= cond.includes("asthma") || cond.includes("copd");
+  const hasPreg = cond.includes("pregnan");
+
+  // Assessment text
+  const assessmentLines: string[] = [];
+  if (level === "urgent") {
+    assessmentLines.push(`This case has been classified as Emergency Risk due to one or more life-threatening signs.`);
+    assessmentLines.push(`Reason(s): ${triage.reasons.join("; ")}.`);
+    assessmentLines.push(`The patient requires immediate hospital referral — do not delay.`);
+    assessmentLines.push(`Apply basic stabilisation measures while arranging emergency transfer.`);
+  } else if (level === "amber") {
+    assessmentLines.push(`This case is classified as Medium Risk — no immediate emergency signs, but clinical attention is needed.`);
+    assessmentLines.push(`Notable findings: ${triage.reasons.join("; ")}.`);
+    if (hasFever && durationDays >= 2) assessmentLines.push(`Fever has been present for ${durationDays}+ days, which warrants further investigation.`);
+    assessmentLines.push(`A remote doctor consultation is recommended to review and guide further management.`);
+    assessmentLines.push(`Monitor vitals closely and reassess if any deterioration occurs.`);
+  } else {
+    assessmentLines.push(`This case is classified as Low Risk — vitals are within normal range and no red-flag symptoms are present.`);
+    assessmentLines.push(`The presenting symptoms appear consistent with a minor or self-limiting condition.`);
+    assessmentLines.push(`Provide appropriate first-aid guidance, ensure hydration and rest, and advise return if symptoms worsen.`);
+    assessmentLines.push(`Routine review is recommended within 2–3 days if symptoms persist.`);
+  }
+
+  // First-aid guidance
+  const firstAidLines: string[] = [];
+  if (level === "urgent") {
+    firstAidLines.push("• Keep patient in a safe, comfortable position (recovery position if unconscious).");
+    firstAidLines.push("• Do NOT give food or water by mouth if unconscious or having seizures.");
+    firstAidLines.push("• Apply firm pressure to any bleeding wound.");
+    firstAidLines.push("• Keep the patient warm and reassure them.");
+    firstAidLines.push("• Contact emergency services and arrange immediate hospital transfer.");
+  } else {
+    firstAidLines.push("• Ensure rest in a cool, well-ventilated area.");
+    if (hasFever) firstAidLines.push("• Apply a damp tepid cloth on forehead. Give Paracetamol 500mg every 6–8 hrs if temp > 101°F.");
+    firstAidLines.push("• Encourage oral fluids — water or ORS (1 packet per 1L clean water).");
+    if (hasWound) firstAidLines.push("• Clean wound with clean water, apply antiseptic, and cover with a sterile dressing.");
+    firstAidLines.push("• Record vitals every 4–6 hours and note any changes.");
+    firstAidLines.push("• If any new emergency sign appears, escalate immediately.");
+  }
+
+  const escalation =
+    level === "urgent" ? "🔴 Emergency Risk → Immediate hospital referral" :
+    level === "amber"  ? "🟡 Medium Risk → Doctor consultation required"   :
+                         "🟢 Low Risk → Basic care and routine review";
+
+  return [
+    `## TRIAGE SUMMARY`,
+    ``,
+    `**Risk Level:** ${badge}`,
+    ``,
+    `### Vital Signs`,
+    `- Temperature: ${vitals.temp || "—"} °F`,
+    `- Blood Pressure: ${vitals.bp || "—"}`,
+    `- Pulse: ${vitals.pulse || "—"} bpm`,
+    `- SpO₂: ${vitals.spo2 || "—"} %`,
+    ``,
+    `### Safety Checklist`,
+    `- [${chk(tempOk)}] Temperature ≤ 105°F`,
+    `- [${chk(spo2Ok)}] SpO₂ ≥ 92%`,
+    `- [${chk(noBreathing)}] No severe breathing difficulty`,
+    `- [${chk(noChest)}] No chest pain`,
+    `- [${chk(conscious)}] Patient conscious and responsive`,
+    `- [${chk(noBleeding)}] No severe bleeding`,
+    `- [${chk(noSeizure)}] No seizure`,
+    ``,
+    `### Symptoms`,
+    `- Fever: ${yn(hasFever)}`,
+    `- Weakness: ${yn(hasWeakness)}`,
+    `- Injury/Wound: ${yn(hasWound)}`,
+    `- Duration: ${symptoms.duration || "—"}`,
+    ``,
+    `### Medical History`,
+    `- Diabetes: ${yn(hasDM)}`,
+    `- Hypertension: ${yn(hasHTN)}`,
+    `- Heart disease: ${yn(hasHeart)}`,
+    `- Asthma/COPD: ${yn(hasAsthma)}`,
+    `- Pregnancy: ${yn(hasPreg)}`,
+    ``,
+    `### AI Preliminary Assessment`,
+    ...assessmentLines,
+    ``,
+    `### Immediate First-Aid Guidance`,
+    ...firstAidLines,
+    ``,
+    `### Escalation`,
+    `${escalation}`,
+    ``,
+    `---`,
+    `*AI-generated triage and summary. Final medical decision must be made by the licensed doctor.*`,
+  ].join("\n");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROMPT 2 — Doctor Handover Summary (sent to remote doctor)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function buildDoctorHandover(input: TriageSummaryInput): string {
+  const { patient, vitals, symptoms, triage, triageOverride } = input;
+  const level = triageOverride ? triageOverride.level : triage.level;
+
+  const badge =
+    level === "urgent" ? "🔴 Emergency Risk" :
+    level === "amber"  ? "🟡 Medium Risk"    : "🟢 Low Risk";
+
+  const temp  = parseFloat(vitals.temp);
+  const spo2  = parseFloat(vitals.spo2);
+  const pulse = parseFloat(vitals.pulse);
+  const bpM   = (vitals.bp || "").match(/(\d+)\s*\/\s*(\d+)/);
+  const sys   = bpM ? parseInt(bpM[1]) : NaN;
+  const f     = symptoms.flags || [];
+  const s     = symptoms.structured || [];
+
+  const cond  = (patient.history.conditions || "").toLowerCase();
+  const allg  = (patient.history.allergies  || "").toLowerCase();
+
+  // Vital sign status emojis (Prompt 2 thresholds)
+  const tempSt  = isNaN(temp)  ? "—" : temp > 105           ? "❌" : "✅";
+  const bpSt    = isNaN(sys)   ? "—" : (sys < 90)           ? "❌" : "✅";
+  const pulseSt = isNaN(pulse) ? "—" : (pulse > 120 || pulse < 45) ? "❌" : "✅";
+  const spo2St  = isNaN(spo2)  ? "—" : spo2 < 92            ? "❌" : "✅";
+
+  // Chief complaint
+  const chiefComplaint = (s.join(", ") || "Unspecified") +
+    (symptoms.duration ? ` — ${symptoms.duration}` : "");
+
+  // Symptom checklist
+  const symptomList = [
+    ["Fever",               !isNaN(temp) && temp > 101],
+    ["Weakness",            s.includes("Weakness / Fatigue")],
+    ["Cough",               s.includes("Cough / Cold")],
+    ["Breathing difficulty",f.includes("breathlessness")],
+    ["Chest pain",          f.includes("chestPain")],
+    ["Vomiting",            s.includes("Vomiting")],
+    ["Diarrhea",            s.includes("Diarrhea")],
+    ["Minor injury",        s.includes("Minor Cut / Wound")],
+    ["Swelling/redness",    f.includes("severeAbdomen") || s.includes("Minor Cut / Wound")],
+    ["Bleeding",            f.includes("heavyBleeding")],
+  ] as [string, boolean][];
+
+  // History checklist
+  const historyList = [
+    ["Diabetes",          cond.includes("diabet")],
+    ["Hypertension",      cond.includes("hypertens") || cond.includes("blood pressure")],
+    ["Heart disease",     cond.includes("heart") || cond.includes("cardiac")],
+    ["Asthma/COPD",       cond.includes("asthma") || cond.includes("copd")],
+    ["Pregnancy",         cond.includes("pregnan")],
+    ["Allergy to medicines", allg.length > 0],
+  ] as [string, boolean][];
+
+  // Clinical summary
+  const summaryLines: string[] = [];
+  summaryLines.push(`Patient ${patient.name}, ${patient.age} years old, ${patient.gender.toLowerCase()}, presenting with ${chiefComplaint}.`);
+  summaryLines.push(`Vitals: Temp ${vitals.temp}°F, BP ${vitals.bp}, Pulse ${vitals.pulse} bpm, SpO₂ ${vitals.spo2}%.`);
+  if (triage.reasons.length) summaryLines.push(`AI triage flags: ${triage.reasons.join("; ")}.`);
+  if (patient.history.conditions) summaryLines.push(`Medical history: ${patient.history.conditions}.`);
+  if (patient.history.medications) summaryLines.push(`Current medications: ${patient.history.medications}.`);
+  if (symptoms.freeText) summaryLines.push(`Additional notes: ${symptoms.freeText}.`);
+
+  // Actions taken (infer from data available)
+  const actionsTaken = [
+    ["Temperature recorded", !!vitals.temp],
+    ["BP recorded",          !!vitals.bp],
+    ["Pulse recorded",       !!vitals.pulse],
+    ["SpO₂ recorded",        !!vitals.spo2],
+    ["Wound cleaned",        s.includes("Minor Cut / Wound")],
+    ["Dressing applied",     s.includes("Minor Cut / Wound")],
+    ["Hydration advised",    s.includes("Diarrhea") || s.includes("Vomiting") || (!isNaN(temp) && temp > 101)],
+    ["Patient monitored",    true],
+  ] as [string, boolean][];
+
+  // Recommended next step
+  const nextStep =
+    level === "urgent" ? "☑ Immediate emergency referral" :
+    level === "amber"  ? "☑ Priority consultation"        :
+                         "☑ Routine review";
+
+  return [
+    `# REMOTE DOCTOR HANDOVER`,
+    ``,
+    `## Risk Level`,
+    badge,
+    ``,
+    `## Patient Snapshot`,
+    `- Name: ${patient.name}`,
+    `- Age: ${patient.age}`,
+    `- Sex: ${patient.gender}`,
+    `- Preferred Language: ${patient.language || "—"}`,
+    ``,
+    `## Chief Complaint`,
+    chiefComplaint,
+    ``,
+    `## Duration`,
+    symptoms.duration || "—",
+    ``,
+    `## Vital Signs`,
+    `| Parameter     | Value          | Status |`,
+    `|---------------|----------------|--------|`,
+    `| Temperature   | ${vitals.temp || "—"} °F      | ${tempSt}     |`,
+    `| Blood Pressure| ${vitals.bp   || "—"}         | ${bpSt}      |`,
+    `| Pulse         | ${vitals.pulse || "—"} bpm    | ${pulseSt}   |`,
+    `| SpO₂          | ${vitals.spo2 || "—"} %       | ${spo2St}    |`,
+    ``,
+    `## Symptoms`,
+    ...symptomList.map(([label, present]) => `- [${present ? "x" : " "}] ${label}`),
+    ``,
+    `## Medical History`,
+    ...historyList.map(([label, present]) => `- [${present ? "x" : " "}] ${label}`),
+    ``,
+    `## Wound / Image Review`,
+    s.includes("Minor Cut / Wound")
+      ? "Wound reported — image upload field available in intake form. Clean and dressed by health worker."
+      : "No wound or image reported.",
+    ``,
+    `## AI Structured Summary`,
+    ...summaryLines,
+    ``,
+    `## Actions Already Taken`,
+    ...actionsTaken.map(([label, done]) => `- [${done ? "x" : " "}] ${label}`),
+    ``,
+    `## Recommended Next Step`,
+    nextStep,
+    ``,
+    `---`,
+    `**AI-generated triage and summary. Final medical decision must be made by the licensed doctor.**`,
+  ].join("\n");
 }
 
 /**

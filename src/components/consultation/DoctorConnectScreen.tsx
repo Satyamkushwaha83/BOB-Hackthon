@@ -2,8 +2,67 @@
 
 import { useEffect, useState } from "react";
 import { translate } from "@/lib/i18n";
+import { doctors } from "@/lib/auth";
 import { Consultation, DoctorReviewStatus, Patient, UILang, User } from "@/lib/types";
 import { DisclaimerBar, AITag, MicButton, TriageBadge } from "../ui";
+
+/** Strip everything except digits and leading + so wa.me links work */
+function toWaPhone(raw?: string) {
+  if (!raw) return "";
+  return raw.replace(/[^\d+]/g, "").replace(/^\+/, "");
+}
+
+function WhatsAppCallPanel({ uiLang, patientName }: { uiLang: UILang; patientName: string }) {
+  const t = (k: Parameters<typeof translate>[1]) => translate(uiLang, k);
+  const allDoctors = doctors();
+
+  const call = (phone: string, mode: "voice" | "video") => {
+    const num = toWaPhone(phone);
+    if (!num) return;
+    const msg = encodeURIComponent(
+      `🏥 *Sehat-Sarthi – Doctor Consultation*\n\nUrgent consultation needed for patient: *${patientName}*.\n\nPlease pick up — I am calling from the Village Health Centre.`
+    );
+    // wa.me opens WhatsApp chat; worker taps call / video-call inside WhatsApp
+    window.open(`https://wa.me/${num}?text=${msg}`, "_blank");
+  };
+
+  return (
+    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+      <p className="text-sm font-bold text-emerald-800 mb-1 flex items-center gap-2">
+        <span>💬</span> {t("waCallTitle")}
+      </p>
+      <p className="text-xs text-emerald-600 mb-3">{t("waCallSubtitle")}</p>
+      <div className="space-y-2">
+        {allDoctors.map((doc) => (
+          <div key={doc.id} className="flex items-center justify-between bg-white border border-emerald-100 rounded-lg px-3 py-2 gap-2">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-slate-800 truncate">{doc.name}</p>
+              <p className="text-xs text-slate-400 truncate">{doc.specialization} · {doc.phone ?? "—"}</p>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={() => doc.phone && call(doc.phone, "voice")}
+                disabled={!doc.phone}
+                title={t("waVoiceCall")}
+                className="flex items-center gap-1 bg-green-500 hover:bg-green-600 disabled:opacity-40 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
+              >
+                📞 {t("waVoiceCall")}
+              </button>
+              <button
+                onClick={() => doc.phone && call(doc.phone, "video")}
+                disabled={!doc.phone}
+                title={t("waVideoCall")}
+                className="flex items-center gap-1 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
+              >
+                📹 {t("waVideoCall")}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function DoctorConnectScreen({
   patient,
@@ -115,6 +174,11 @@ export function DoctorConnectScreen({
               </ul>
             </div>
           )}
+          {/* WhatsApp call panel — health worker only */}
+          {currentUser.role === "health_worker" && (
+            <WhatsAppCallPanel uiLang={uiLang} patientName={patient.name} />
+          )}
+
           <div>
             <label className="text-xs font-semibold text-slate-400 uppercase mb-1 block">{t("doctorsNotes")}</label>
             <div className="flex gap-2 items-start">
