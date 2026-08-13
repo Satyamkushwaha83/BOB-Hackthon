@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { translate } from "@/lib/i18n";
-import { Patient, UILang } from "@/lib/types";
+import { Gender, Patient, UILang } from "@/lib/types";
+import { validateAge } from "@/lib/validation";
 import { MicButton } from "../ui";
 
 export function NewIntakeSection({
@@ -22,7 +23,8 @@ export function NewIntakeSection({
 
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
-  const [gender, setGender] = useState("Male");
+  const [ageError, setAgeError] = useState<string | null>(null);
+  const [gender, setGender] = useState<Gender>("Male");
   const [language, setLanguage] = useState("Hindi");
   const [phone, setPhone] = useState("");
   const [allergies, setAllergies] = useState("");
@@ -34,6 +36,12 @@ export function NewIntakeSection({
   const canRegister = name.trim() && age.trim();
 
   const submitRegister = () => {
+    const err = validateAge(age);
+    if (err) {
+      setAgeError(err.message);
+      return;
+    }
+    setAgeError(null);
     onRegisterNew({
       name,
       age,
@@ -84,11 +92,20 @@ export function NewIntakeSection({
             </div>
             <div>
               <label className="text-xs font-semibold text-slate-500">{t("age")}</label>
-              <input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+              <input
+                type="number"
+                value={age}
+                onChange={(e) => {
+                  setAge(e.target.value);
+                  if (ageError) setAgeError(null);
+                }}
+                className={`mt-1 w-full border rounded-lg px-3 py-2 text-sm ${ageError ? "border-red-500 bg-red-50 text-red-900 focus:ring-2 focus:ring-red-400" : "border-slate-300"}`}
+              />
+              {ageError && <p className="text-[11px] font-medium text-red-600 mt-0.5">{ageError}</p>}
             </div>
             <div>
               <label className="text-xs font-semibold text-slate-500">{t("gender")}</label>
-              <select value={gender} onChange={(e) => setGender(e.target.value)} className="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+              <select value={gender} onChange={(e) => setGender(e.target.value as Gender)} className="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
@@ -141,3 +158,4 @@ export function NewIntakeSection({
     </div>
   );
 }
+

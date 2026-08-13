@@ -4,7 +4,13 @@ import { useRef, useState } from "react";
 import { translate } from "@/lib/i18n";
 import { Consultation, Patient, UILang } from "@/lib/types";
 import { RED_FLAGS, SYMPTOM_OPTIONS, bpStatus, statusColor, vitalStatus } from "@/lib/rules";
+import {
+  ValidatedField,
+  VitalValidationError,
+  validateAllClinicalInputs,
+} from "@/lib/validation";
 import { MicButton } from "../ui";
+import { ValidationModal } from "../ui/ValidationModal";
 
 export function VisitIntakeForm({
   patient,
@@ -26,14 +32,36 @@ export function VisitIntakeForm({
   const fileRef = useRef<HTMLInputElement>(null);
   const photoRef = useRef<HTMLInputElement>(null);
 
+  // Field refs for focusing on invalid inputs
+  const tempRef = useRef<HTMLInputElement>(null);
+  const bpRef = useRef<HTMLInputElement>(null);
+  const pulseRef = useRef<HTMLInputElement>(null);
+  const spo2Ref = useRef<HTMLInputElement>(null);
+  const ageRef = useRef<HTMLInputElement>(null);
+
+  // Validation state
+  const [fieldErrors, setFieldErrors] = useState<Record<ValidatedField, string | null>>({
+    temp: null,
+    bp: null,
+    pulse: null,
+    spo2: null,
+    age: null,
+  });
+  const [errorList, setErrorList] = useState<VitalValidationError[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const toggleSymptom = (s: string) => {
     updateConsultation((d) => {
-      d.symptoms.structured = d.symptoms.structured.includes(s) ? d.symptoms.structured.filter((x) => x !== s) : [...d.symptoms.structured, s];
+      d.symptoms.structured = d.symptoms.structured.includes(s)
+        ? d.symptoms.structured.filter((x) => x !== s)
+        : [...d.symptoms.structured, s];
     });
   };
   const toggleFlag = (k: string) => {
     updateConsultation((d) => {
-      d.symptoms.flags = d.symptoms.flags.includes(k) ? d.symptoms.flags.filter((x) => x !== k) : [...d.symptoms.flags, k];
+      d.symptoms.flags = d.symptoms.flags.includes(k)
+        ? d.symptoms.flags.filter((x) => x !== k)
+        : [...d.symptoms.flags, k];
     });
   };
   const simulateOCR = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,12 +86,67 @@ export function VisitIntakeForm({
 
   const canSubmit = consultation.symptoms.structured.length > 0 || Boolean(consultation.symptoms.freeText);
 
+  const handleFormSubmit = () => {
+    const validationResult = validateAllClinicalInputs(consultation.vitals, patient.age);
+
+    if (!validationResult.isValid) {
+      setFieldErrors(validationResult.errors);
+      setErrorList(validationResult.errorList);
+      setIsModalOpen(true);
+
+      // Scroll to and focus the first invalid field
+      const firstField = validationResult.firstErrorField;
+      if (firstField === "temp") tempRef.current?.focus();
+      else if (firstField === "bp") bpRef.current?.focus();
+      else if (firstField === "pulse") pulseRef.current?.focus();
+      else if (firstField === "spo2") spo2Ref.current?.focus();
+      else if (firstField === "age") ageRef.current?.focus();
+
+      return;
+    }
+
+    // Clear validation state and trigger submission
+    setFieldErrors({ temp: null, bp: null, pulse: null, spo2: null, age: null });
+    setErrorList([]);
+    setIsModalOpen(false);
+    onSubmit();
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
-      <h3 className="font-bold text-lg text-slate-800">
-        👤 {patient.name} <span className="text-sm font-normal text-slate-400">· {patient.age}y · {patient.gender}</span>
-      </h3>
+      {/* Patient Header & Editable Age */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-slate-100">
+        <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+          👤 {patient.name} <span className="text-sm font-normal text-slate-400">· {patient.gender}</span>
+        </h3>
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-semibold text-slate-600">Age (years):</label>
+          <div>
+            <input
+              ref={ageRef}
+              type="number"
+              value={patient.age}
+              onChange={(e) => {
+                updatePatient((d) => {
+                  d.age = e.target.value;
+                });
+                if (fieldErrors.age) setFieldErrors((prev) => ({ ...prev, age: null }));
+              }}
+              placeholder="e.g. 45"
+              className={`w-24 border rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
+                fieldErrors.age
+                  ? "border-red-500 bg-red-50 text-red-900 focus:ring-2 focus:ring-red-400 focus:border-red-500 ring-2 ring-red-200"
+                  : "border-slate-300 text-slate-800"
+              }`}
+            />
+            {fieldErrors.age && (
+              <p className="text-[11px] font-medium text-red-600 mt-0.5">{fieldErrors.age}</p>
+            )}
+          </div>
+        </div>
+      </div>
 
+      {/* Symptoms */}
       <div>
         <label className="text-xs font-semibold text-slate-500 block mb-2">{t("symptomsLabel")}</label>
         <div className="flex flex-wrap gap-2 mb-3">
@@ -72,7 +155,9 @@ export function VisitIntakeForm({
               key={s}
               onClick={() => toggleSymptom(s)}
               className={`text-xs px-3 py-1.5 rounded-full border transition ${
-                consultation.symptoms.structured.includes(s) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-300 hover:border-blue-400"
+                consultation.symptoms.structured.includes(s)
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-slate-600 border-slate-300 hover:border-blue-400"
               }`}
             >
               {s}
@@ -100,6 +185,7 @@ export function VisitIntakeForm({
         </div>
       </div>
 
+      {/* Red Flags Check */}
       <div className="bg-red-50 border border-red-200 rounded-lg p-3">
         <label className="text-xs font-semibold text-red-700 block mb-2">⚠️ {t("redFlagCheck")}</label>
         <div className="flex flex-wrap gap-3">
@@ -111,34 +197,55 @@ export function VisitIntakeForm({
         </div>
       </div>
 
+      {/* Clinical Vitals Section with Validation Highlights */}
       <div>
-        <label className="text-xs font-semibold text-slate-500 block mb-2">{t("vitalsLabel")}</label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {(
-            [
-              { key: "temp", label: "Temperature (°F)", ph: "98.6" },
-              { key: "bp", label: "Blood Pressure (mmHg)", ph: "120/80" },
-              { key: "pulse", label: "Pulse (bpm)", ph: "72" },
-              { key: "spo2", label: "SpO2 (%)", ph: "98" },
-            ] as const
-          ).map((v) => {
-            const raw = consultation.vitals[v.key];
-            const st = v.key === "bp" ? bpStatus(raw) : vitalStatus(v.key, raw);
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-semibold text-slate-500 block">{t("vitalsLabel")}</label>
+          <span className="text-[11px] text-slate-400 font-medium">All vitals are validated prior to summary generation</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { key: "temp", label: "Temperature (°F)", ph: "98.6", ref: tempRef, helper: "Bounds: 80.0°F - 115.0°F" },
+            { key: "bp", label: "Blood Pressure (mmHg)", ph: "120/80", ref: bpRef, helper: "Format: Systolic/Diastolic" },
+            { key: "pulse", label: "Pulse (bpm)", ph: "72", ref: pulseRef, helper: "Bounds: 30 - 250 bpm" },
+            { key: "spo2", label: "SpO2 (%)", ph: "98", ref: spo2Ref, helper: "Bounds: 50% - 100%" },
+          ].map((v) => {
+            const raw = consultation.vitals[v.key as keyof typeof consultation.vitals] || "";
+            const err = fieldErrors[v.key as ValidatedField];
+            const st = v.key === "bp" ? bpStatus(raw) : vitalStatus(v.key as "temp" | "pulse" | "spo2", raw);
+
             return (
-              <div key={v.key}>
-                <label className="text-xs text-slate-500">{v.label}</label>
+              <div key={v.key} className="space-y-1">
+                <label className="text-xs font-medium text-slate-600 block">{v.label}</label>
                 <input
+                  ref={v.ref}
                   value={raw}
-                  onChange={(e) => updateConsultation((d) => { d.vitals[v.key] = e.target.value; })}
+                  onChange={(e) => {
+                    updateConsultation((d) => { d.vitals[v.key as keyof typeof consultation.vitals] = e.target.value; });
+                    if (fieldErrors[v.key as ValidatedField]) {
+                      setFieldErrors((prev) => ({ ...prev, [v.key]: null }));
+                    }
+                  }}
                   placeholder={v.ph}
-                  className={`mt-1 w-full border rounded-lg px-3 py-2 text-sm font-semibold ${statusColor[st]}`}
+                  className={`mt-1 w-full border rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                    err
+                      ? "border-red-500 bg-red-50 text-red-900 focus:ring-2 focus:ring-red-400 focus:border-red-500 ring-2 ring-red-200"
+                      : statusColor[st]
+                  }`}
                 />
+                {err ? (
+                  <p className="text-[11px] font-medium text-red-600 leading-snug">{err}</p>
+                ) : (
+                  <p className="text-[10px] text-slate-400">{v.helper}</p>
+                )}
               </div>
             );
           })}
         </div>
       </div>
 
+      {/* History */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="text-xs font-semibold text-slate-500">{t("allergies")}</label>
@@ -154,6 +261,7 @@ export function VisitIntakeForm({
         </div>
       </div>
 
+      {/* Attachments & OCR */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="border border-dashed border-slate-300 rounded-lg p-4 text-center">
           <p className="text-xs font-semibold text-slate-500 mb-2">📄 {t("uploadPrescription")}</p>
@@ -175,11 +283,26 @@ export function VisitIntakeForm({
         </div>
       </div>
 
+      {/* Form Submission Footer */}
       <div className="flex justify-end pt-2 border-t border-slate-100">
-        <button disabled={!canSubmit} onClick={onSubmit} className={`px-6 py-2.5 rounded-lg font-semibold text-white transition ${canSubmit ? "bg-blue-600 hover:bg-blue-700" : "bg-slate-300 cursor-not-allowed"}`}>
+        <button
+          disabled={!canSubmit}
+          onClick={handleFormSubmit}
+          className={`px-6 py-2.5 rounded-lg font-semibold text-white transition ${
+            canSubmit ? "bg-blue-600 hover:bg-blue-700 shadow-sm" : "bg-slate-300 cursor-not-allowed"
+          }`}
+        >
           {t("generateSummary")}
         </button>
       </div>
+
+      {/* Validation Alert Modal */}
+      <ValidationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        errors={errorList}
+      />
     </div>
   );
 }
+

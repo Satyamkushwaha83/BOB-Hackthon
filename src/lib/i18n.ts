@@ -622,7 +622,7 @@ export const GUIDE_CONTENT: Record<UILang, Record<string, GuideConditionText>> =
       dangerSigns: ["Burn is larger than the patient's palm", "Burn on face, hands, feet, or genitals", "Skin is white, charred, or leathery (deep burn)", "Burn from electricity or chemicals"],
     },
     cold: {
-      title: "Common Cold",
+      title: "Common Cold / Cough",
       steps: [
         "Steam inhalation twice a day can ease congestion.",
         "Warm fluids (soup, warm water with honey) soothe the throat.",
@@ -631,6 +631,49 @@ export const GUIDE_CONTENT: Record<UILang, Record<string, GuideConditionText>> =
         "If cough persists beyond a week, or breathing difficulty develops — escalate to doctor.",
       ],
       dangerSigns: ["Difficulty breathing or fast breathing", "Bluish lips or face", "Cough with high fever for more than 3 days", "Chest pain with cough"],
+    },
+    diarrhea: {
+      title: "Diarrhea",
+      steps: [
+        "Give ORS (Oral Rehydration Solution) — 1 packet per litre of clean water, sip frequently.",
+        "Continue feeding — do NOT fast the patient, especially children.",
+        "Wash hands with soap before preparing food or ORS.",
+        "Watch for signs of dehydration: sunken eyes, dry mouth, no urine for 6+ hours.",
+        "If stools contain blood or mucus, or dehydration worsens — escalate to doctor immediately.",
+      ],
+      dangerSigns: ["Watery stool more than 10 times a day", "Blood or mucus in stool", "Unable to keep any fluid down", "Signs of severe dehydration: extreme weakness, sunken eyes"],
+    },
+    "abdominal-pain": {
+      title: "Abdominal Pain",
+      steps: [
+        "Help the patient rest in a comfortable position.",
+        "Encourage small sips of water if nausea is not present.",
+        "Do NOT give strong painkillers or antispasmodics without doctor advice.",
+        "Note the location, severity and whether pain is constant or crampy.",
+        "If pain is severe, worsening, or belly is rigid — escalate to doctor immediately.",
+      ],
+      dangerSigns: ["Rigid or board-like abdomen", "Pain with fever and vomiting", "Pain after injury to abdomen", "Pain in a pregnant woman"],
+    },
+    eye: {
+      title: "Eye Redness / Discharge",
+      steps: [
+        "Do NOT rub the eye — this can worsen irritation or spread infection.",
+        "Wash hands thoroughly before touching near the eye.",
+        "Gently clean discharge with a clean, wet cloth (from inner to outer corner).",
+        "If caused by a chemical splash — rinse with clean water for 15 minutes and refer immediately.",
+        "If vision is affected, refer to doctor urgently.",
+      ],
+      dangerSigns: ["Sudden loss of vision", "Severe eye pain", "Eye injury or foreign body not removable", "Chemical in eye"],
+    },
+    "ear-pain": {
+      title: "Ear Pain",
+      steps: [
+        "Have the patient tilt their head to let any water drain out.",
+        "A warm (not hot) cloth held against the outer ear can ease pain.",
+        "Do NOT insert any object into the ear canal.",
+        "If there is discharge from the ear, do NOT block it — refer to doctor.",
+      ],
+      dangerSigns: ["Discharge from the ear (especially if smelly or bloody)", "Sudden hearing loss", "Severe pain unrelieved by paracetamol", "Swelling or redness behind the ear"],
     },
   },
   hi: {
@@ -690,6 +733,49 @@ export const GUIDE_CONTENT: Record<UILang, Record<string, GuideConditionText>> =
       ],
       dangerSigns: ["सांस लेने में कठिनाई या तेज़ सांस", "होंठ या चेहरा नीला पड़ना", "3 दिन से अधिक तेज़ बुखार के साथ खांसी", "खांसी के साथ सीने में दर्द"],
     },
+    diarrhea: {
+      title: "दस्त / डायरिया",
+      steps: [
+        "ORS (ओरल रिहाइड्रेशन सॉल्यूशन) दें — 1 लीटर साफ पानी में 1 पैकेट, बार-बार घूंट-घूंट पिलाएं।",
+        "खाना बंद न करें — खासकर बच्चों को।",
+        "खाना बनाने या ORS तैयार करने से पहले साबुन से हाथ धोएं।",
+        "निर्जलीकरण के संकेत देखें: धंसी हुई आंखें, सूखा मुंह, 6+ घंटे पेशाब नहीं।",
+        "यदि मल में खून या बलगम हो, या निर्जलीकरण बढ़े — तुरंत डॉक्टर के पास भेजें।",
+      ],
+      dangerSigns: ["दिन में 10 से अधिक बार पतला दस्त", "मल में खून या बलगम", "कुछ भी पिया नहीं रह पा रहा", "गंभीर निर्जलीकरण के संकेत: अत्यधिक कमज़ोरी, धंसी हुई आंखें"],
+    },
+    "abdominal-pain": {
+      title: "पेट दर्द",
+      steps: [
+        "मरीज़ को आरामदायक स्थिति में लिटाएं।",
+        "यदि मतली न हो तो थोड़ा-थोड़ा पानी पिलाएं।",
+        "बिना डॉक्टर की सलाह के तेज़ दर्द-निवारक या ऐंठन की दवा न दें।",
+        "दर्द की जगह, तीव्रता और यह लगातार है या ऐंठन वाला — यह नोट करें।",
+        "यदि दर्द तेज़ हो, बढ़ रहा हो, या पेट कठोर हो — तुरंत डॉक्टर के पास भेजें।",
+      ],
+      dangerSigns: ["कठोर / तख्ते जैसा पेट", "बुखार और उल्टी के साथ दर्द", "पेट पर चोट के बाद दर्द", "गर्भवती महिला में दर्द"],
+    },
+    eye: {
+      title: "आंख लाल होना / स्राव",
+      steps: [
+        "आंख न रगड़ें — इससे जलन बढ़ सकती है या संक्रमण फैल सकता है।",
+        "आंख के पास छूने से पहले अच्छे से हाथ धोएं।",
+        "साफ गीले कपड़े से स्राव को अंदर से बाहर की तरफ धीरे पोंछें।",
+        "यदि रासायनिक छींटे पड़े हों — 15 मिनट तक साफ पानी से धोएं और तुरंत रेफर करें।",
+        "यदि नज़र प्रभावित हो तो तत्काल डॉक्टर के पास भेजें।",
+      ],
+      dangerSigns: ["अचानक दृष्टि खो जाना", "आंख में तेज़ दर्द", "आंख में चोट या बाहरी वस्तु जो निकल न रहे", "आंख में रसायन"],
+    },
+    "ear-pain": {
+      title: "कान दर्द",
+      steps: [
+        "मरीज़ का सिर झुकाएं ताकि पानी निकल सके।",
+        "बाहरी कान पर गर्म (गर्म नहीं, हल्का गर्म) कपड़ा रखने से दर्द कम हो सकता है।",
+        "कान के अंदर कोई वस्तु न डालें।",
+        "यदि कान से स्राव हो रहा हो तो उसे बंद न करें — डॉक्टर के पास भेजें।",
+      ],
+      dangerSigns: ["कान से स्राव (खासकर बदबूदार या खूनी)", "अचानक सुनाई देना बंद होना", "पैरासिटामोल से न ठीक होने वाला तेज़ दर्द", "कान के पीछे सूजन या लालिमा"],
+    },
   },
   mr: {
     fever: {
@@ -747,6 +833,49 @@ export const GUIDE_CONTENT: Record<UILang, Record<string, GuideConditionText>> =
         "खोकला एका आठवड्यापेक्षा जास्त राहिल्यास, किंवा श्वास घेण्यास त्रास झाल्यास — डॉक्टरांकडे पाठवा.",
       ],
       dangerSigns: ["श्वास घेण्यास त्रास किंवा जलद श्वासोच्छ्वास", "ओठ किंवा चेहरा निळसर होणे", "3 दिवसांपेक्षा जास्त तीव्र तापासह खोकला", "खोकल्यासह छातीत दुखणे"],
+    },
+    diarrhea: {
+      title: "जुलाब / अतिसार",
+      steps: [
+        "ORS (तोंडावाटे पुनर्जलीकरण द्रावण) द्या — 1 लिटर स्वच्छ पाण्यात 1 पाकीट, वारंवार घोट-घोट प्यायला सांगा.",
+        "खाणे बंद करू नका — विशेषतः मुलांसाठी.",
+        "अन्न किंवा ORS तयार करण्यापूर्वी साबणाने हात धुवा.",
+        "निर्जलीकरणाची लक्षणे पाहा: खोलगट डोळे, कोरडे तोंड, 6+ तास लघवी नाही.",
+        "मलात रक्त किंवा श्लेष्मा असल्यास, किंवा निर्जलीकरण वाढल्यास — ताबडतोब डॉक्टरांकडे पाठवा.",
+      ],
+      dangerSigns: ["दिवसातून 10 पेक्षा जास्त वेळा पातळ जुलाब", "मलात रक्त किंवा श्लेष्मा", "काहीही प्यायले राहत नाही", "तीव्र निर्जलीकरणाची लक्षणे: अत्यंत अशक्तपणा, खोलगट डोळे"],
+    },
+    "abdominal-pain": {
+      title: "पोटदुखी",
+      steps: [
+        "रुग्णाला आरामदायक स्थितीत झोपवा.",
+        "मळमळ नसल्यास थोडे-थोडे पाणी प्यायला द्या.",
+        "डॉक्टरांच्या सल्ल्याशिवाय तीव्र वेदनाशामक किंवा उबळ-निवारक देऊ नका.",
+        "वेदनेचे ठिकाण, तीव्रता आणि ती सतत आहे की उबळ येते — नोंद करा.",
+        "वेदना तीव्र असल्यास, वाढत असल्यास, किंवा पोट कडक असल्यास — ताबडतोब डॉक्टरांकडे पाठवा.",
+      ],
+      dangerSigns: ["कडक / फळीसारखे पोट", "ताप आणि उलट्यांसह दुखणे", "पोटावर दुखापतीनंतर दुखणे", "गर्भवती महिलेत दुखणे"],
+    },
+    eye: {
+      title: "डोळे लाल होणे / स्राव",
+      steps: [
+        "डोळा चोळू नका — यामुळे जळजळ वाढू शकते किंवा संसर्ग पसरू शकतो.",
+        "डोळ्याजवळ स्पर्श करण्यापूर्वी हात चांगले धुवा.",
+        "स्वच्छ ओल्या कापडाने स्राव आतून बाहेरच्या दिशेने हळुवारपणे पुसा.",
+        "रासायनिक उडाल्यास — 15 मिनिटे स्वच्छ पाण्याने धुवा आणि ताबडतोब रेफर करा.",
+        "दृष्टी प्रभावित झाल्यास तातडीने डॉक्टरांकडे पाठवा.",
+      ],
+      dangerSigns: ["अचानक दृष्टी जाणे", "डोळ्यात तीव्र वेदना", "डोळ्यात दुखापत किंवा परकीय वस्तू काढता येत नाही", "डोळ्यात रसायन"],
+    },
+    "ear-pain": {
+      title: "कान दुखणे",
+      steps: [
+        "पाणी निघण्यासाठी रुग्णाने डोके कलवावे.",
+        "बाह्य कानावर उबदार (गरम नाही) कापड ठेवल्याने वेदना कमी होऊ शकते.",
+        "कानात कोणतीही वस्तू घालू नका.",
+        "कानातून स्राव होत असल्यास तो अडवू नका — डॉक्टरांकडे पाठवा.",
+      ],
+      dangerSigns: ["कानातून स्राव (विशेषतः दुर्गंधीयुक्त किंवा रक्तरंजित)", "अचानक ऐकू येणे बंद होणे", "पॅरासिटामॉलने आराम न मिळणारी तीव्र वेदना", "कानामागे सूज किंवा लालसरपणा"],
     },
   },
 };
